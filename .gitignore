@@ -17,6 +17,12 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Files Heroku recommends not to include
+/node_modules
+npm-debug.log
+.DS_Store
+/*.env
+
 # =========================
 # Operating System Files
 # =========================
