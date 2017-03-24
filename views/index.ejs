@@ -9,71 +9,10 @@
   <meta name="description" content="JQuery Get Post">
   <meta name="author" content="Kevin Nolan">
 
-  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-
-  <style>
-  </style>
 
 </head>
 
 <body>
-<script>
-
-var ok = true; // Necessary to stop an Uncaught Reference error from appearing.
-// Uncaught reference error is apparently impossible to avoid due to responsebin'script
-// response format. See http://stackoverflow.com/questions/10179756/using-requestbin
-$(document).ready(function() {
-  $("button").click(function() {
-    $.get('https://randomuser.me/api/?results=5',function (users,status) {
-      console.log("===Received: ",JSON.stringify(users.results[0]));
-      console.log("===Received Status: "+status);
-      processUsers(users);
-      // Don't send on error
-    });
-  });
-});
-
-function processUsers(userList) {
-  let ourUserL = [];
-  userList.results.forEach((user,i)=> {
-    let ourU = {};    
-    
-    ourU.firstname = user.name.first;
-    ourU.surname = user.name.last;
-    //console.log();
-    ourU.emailDomain = user.email.slice(user.email.indexOf('@')+1)
-    let x = new Date(Date.parse(user.registered));
-    let y = new Date(Date.parse(user.dob));
-    ourU.ageWhenRegistered = x.getFullYear()-y.getFullYear();
-    ourU.mobileNumber = user.cell; // Will be converted in backend to E164
-    ourU.phoneNumber = user.phone; // As above
-    ourU.phoneNumberCountryCode = user.nat;
-    ourUserL.push(ourU);
-  });
-
-}
-
-/*
-function postUser(ourU) {
-  $.ajax({
-    url:'https://requestb.in/1fkwxhq1',
-    type: "GET",
-    dataType: 'jsonp',
-    data: ourU,
-    success: function(result) {
-      console.log('===Successfully posted.', result);
-    },
-    error: function (msg) {
-      console.log("===Sent: ",msg);
-      // Unavoidable error because requestb.in only allows jsonp data type and
-      // response it sends is not in jsonp format. See http://stackoverflow.com/questions/32637677/jquery-ajax-call-returning-an-error-with-readystate-4-status-200-statustext-ok
-      // However the output still appears on requestb.in.
-    }
-  });
-}*/
-
-</script>
 <h1>Get, process and post user list</h1>
 <form action="/getsend" method="POST">
 <button>Go!</button>

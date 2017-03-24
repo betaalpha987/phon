@@ -8,7 +8,8 @@ var http = require('http');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  //console.log(req.query.msg);
+  res.render('index');
 });
 
 router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
@@ -16,7 +17,9 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
 
   var url ='https://randomuser.me/api/?results=5'
   request(url, function (error, response, usersStr) {
-    if (!error) { // What happens if error?
+    if (error) console.log(error); // Show more prominently
+    else {
+      console.log('Received user data from randomuser.me. Processing...');
       let ourUserL = [];
       let userList = JSON.parse(usersStr);
       
@@ -35,22 +38,36 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
         ourU.phoneNumberCountryCode = user.nat;
         ourUserL.push(ourU);
       });
-      sendUsers(ourUserL);
+      console.log('Processed. Sending processed user data...');
+      // Send each user seperately. Can I check all posts got sent with a tally?
+      let i = 0;
+      let interv = setInterval(()=>{ // Slight delay added as otherwise requestbin seems to lose posts
+        sendUser(ourUserL[i],i);
+        i+=1;
+        if (i >=5) clearInterval(interv);
+      },1000);
     }
   });
 
-  function sendUsers(ourUserL) {
-    app.post("")
-/*    url:'https://requestb.in/1fkwxhq1',
-    type: "GET",
-    dataType: 'jsonp',
-    data: ourU,
-    success: function(result) {
-      console.log('===Successfully posted.', result);
-    },
-*/ 
-    res.render('getsend', { title: 'Testing' });
+  function sendUser(usr,ind) {
+    request({
+      url: "https://requestb.in/1fkwxhq1",
+      method: "POST",
+      json: true,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: {user: usr, index: ind}
+    }, function (error, result, body) {
+      if (error) return console.log(error); // Display with error page?
+      else {
+        console.log('Sent successfully: User '+ind+'. Message: '+body);
+      }
+    });
 
+/*    
+    res.redirect('/pizzaVote')
+ */
 
   }
 
