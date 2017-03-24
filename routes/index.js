@@ -3,6 +3,7 @@ var router = express.Router();
 
 var PNF = require('google-libphonenumber').PhoneNumberFormat;
 var request = require('request');
+var http = require('http');
 
 
 /* GET home page. */
@@ -34,12 +35,25 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
         ourU.phoneNumberCountryCode = user.nat;
         ourUserL.push(ourU);
       });
-      console.log(ourUserL);
+      sendUsers(ourUserL);
     }
   });
 
+  function sendUsers(ourUserL) {
+    app.post("")
+/*    url:'https://requestb.in/1fkwxhq1',
+    type: "GET",
+    dataType: 'jsonp',
+    data: ourU,
+    success: function(result) {
+      console.log('===Successfully posted.', result);
+    },
+*/ 
+    res.render('getsend', { title: 'Testing' });
 
-  res.render('getsend', { title: 'Testing' });
+
+  }
+
 
 });
 
