@@ -51,13 +51,13 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
 
   function sendUser(usr,ind) {
     request({
-      url: "https://requestb.in/1fkwxhq1",
+      url: "http://requestb.in/10gc05d1", // The old requestbin timed out. Here's a new one.
       method: "POST",
       json: true,
       headers: {
         "content-type": "application/json",
       },
-      body: {user: usr, index: ind}
+      body: {user: usr, index: ind} // Includes user number sent
     }, function (error, result, body) {
       if (error) return console.log(error); // Display with error page?
       else {
