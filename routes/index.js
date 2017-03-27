@@ -25,10 +25,12 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
   rUserURL ='https://randomuser.me/api/?results=5';
   rBinURL = "http://requestb.in/1341zoa1"; // The old requestbin timed out. Here's a new one.
 
+  res.io.emit('messages','Requesting data from ' + rUserURL);
+
   request(rUserURL, function (error, response, usersStr) {
-    if (error) res.io.emit('messages',error);
+    if (error) res.io.emit('messages', error.name + ': ' + error.message);
     else {
-      res.io.emit('messages','Received user data from randomuser.me. Processing...');
+      res.io.emit('messages','Received user data. Processing...');
       let ourUserL = [];
       let userList = JSON.parse(usersStr);
       
@@ -47,7 +49,7 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
         ourU.phoneNumberCountryCode = user.nat;
         ourUserL.push(ourU);
       });
-      res.io.emit("messages", "User data processed. Sending...");
+      res.io.emit("messages", "User data processed. Sending to " + rBinURL);
 
       // Send each user seperately.
       // Slight delay between posts as otherwise requestbin sometimes loses them
@@ -57,7 +59,7 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
           sendUser(ourUserL[i],i);
           i+=1;
         } else {
-          res.io.emit('messages', 'Go '+rBinURL+'/?inspect to view users in destination API');
+          res.io.emit('messages', 'Go <a href="'+rBinURL+'/?inspect">here</a> to view users in destination API');
           clearInterval(interv);
         }
       },1000);
@@ -74,7 +76,7 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
       },
       body: usr
     }, function (error, result, body) {
-      if (error) res.io.emit('messages', error);
+      if (error) res.io.emit('messages', error.name + ': ' + error.message);
       else {
         res.io.emit('messages', 'Sent successfully: User '+ind+'. Message: '+body);
       }

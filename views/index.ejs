@@ -61,7 +61,7 @@
     var socket = io();
     socket.on('messages', function (msg) {
       console.log(msg);
-      $('#messages').append($('<li>').text(msg));
+      $('#messages').append($('<li>').html(msg));
     });
   });
   
