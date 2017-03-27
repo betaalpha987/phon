@@ -1,9 +1,16 @@
 {
   "name": "phon",
-  "version": "0.0.0",
+  "description": "Kevin Nolan's Portfolio",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./bin/www"
+  },
+  "author": "kevin-nolan",
+  "license": "personal",
+  "engines": {
+    "node": "6.9.4"
   },
   "dependencies": {
     "body-parser": "~1.16.0",

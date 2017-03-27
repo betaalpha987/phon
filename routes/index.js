@@ -59,7 +59,7 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
           sendUser(ourUserL[i],i);
           i+=1;
         } else {
-          res.io.emit('messages', 'Go <a href="'+rBinURL+'/?inspect">here</a> to view users in destination API');
+          res.io.emit('messages', 'Go <a href="'+rBinURL+'?inspect">here</a> to view users in destination API');
           clearInterval(interv);
         }
       },1000);
