@@ -7,6 +7,7 @@ var http = require('http').Server(router);
 var io = require('socket.io')(http);
 
 
+
 router.get('/', function(req, res, next) {
   res.render('index');
 });
@@ -18,15 +19,16 @@ io.on('connection', function(socket){
   });
 });
 
-
 router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
   var phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 
-  var url ='https://randomuser.me/api/?results=5'
-  request(url, function (error, response, usersStr) {
-    if (error) console.log(error); // Show more prominently
+  rUserURL ='https://randomuser.me/api/?results=5';
+  rBinURL = "http://requestb.in/1341zoa1"; // The old requestbin timed out. Here's a new one.
+
+  request(rUserURL, function (error, response, usersStr) {
+    if (error) res.io.emit('messages',error);
     else {
-      res.io.emit('socketToMe','Received user data from randomuser.me. Processing...');
+      res.io.emit('messages','Received user data from randomuser.me. Processing...');
       let ourUserL = [];
       let userList = JSON.parse(usersStr);
       
@@ -45,37 +47,39 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
         ourU.phoneNumberCountryCode = user.nat;
         ourUserL.push(ourU);
       });
-      res.io.emit("socketToMe", "User data processed. Sending...");
+      res.io.emit("messages", "User data processed. Sending...");
 
-      // Send each user seperately. Can I check all posts got sent with a tally?
+      // Send each user seperately.
+      // Slight delay between posts as otherwise requestbin sometimes loses them
       let i = 0;
-      let interv = setInterval(()=>{ // Slight delay added as otherwise requestbin seems to lose posts
-        sendUser(ourUserL[i],i);
-        i+=1;
-        if (i >=5) clearInterval(interv);
+      let interv = setInterval(()=>{
+        if (i <5) {
+          sendUser(ourUserL[i],i);
+          i+=1;
+        } else {
+          res.io.emit('messages', 'Go '+rBinURL+'/?inspect to view users in destination API');
+          clearInterval(interv);
+        }
       },1000);
     }
   });
 
   function sendUser(usr,ind) {
     request({
-      url: "http://requestb.in/10gc05d1", // The old requestbin timed out. Here's a new one.
+      url: rBinURL, 
       method: "POST",
       json: true,
       headers: {
         "content-type": "application/json",
       },
-      body: {user: usr, index: ind} // Includes user number sent
+      body: usr
     }, function (error, result, body) {
-      if (error) return console.log(error); // Display with error page?
+      if (error) res.io.emit('messages', error);
       else {
-        res.io.emit('socketToMe', 'Sent successfully: User '+ind+'. Message: '+body);
+        res.io.emit('messages', 'Sent successfully: User '+ind+'. Message: '+body);
       }
     });
-
   }
-
-
 });
 
 module.exports = router;
