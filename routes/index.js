@@ -3,14 +3,21 @@ var router = express.Router();
 
 var PNF = require('google-libphonenumber').PhoneNumberFormat;
 var request = require('request');
-var http = require('http');
+var http = require('http').Server(router);
+var io = require('socket.io')(http);
 
 
-/* GET home page. */
 router.get('/', function(req, res, next) {
-  //console.log(req.query.msg);
   res.render('index');
 });
+
+io.on('connection', function(socket){
+  console.log('A user connected');
+  socket.on('disconnect', function() {
+    console.log('user disconnected');
+  });
+});
+
 
 router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
   var phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
@@ -19,7 +26,7 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
   request(url, function (error, response, usersStr) {
     if (error) console.log(error); // Show more prominently
     else {
-      console.log('Received user data from randomuser.me. Processing...');
+      res.io.emit('socketToMe','Received user data from randomuser.me. Processing...');
       let ourUserL = [];
       let userList = JSON.parse(usersStr);
       
@@ -38,7 +45,8 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
         ourU.phoneNumberCountryCode = user.nat;
         ourUserL.push(ourU);
       });
-      console.log('Processed. Sending processed user data...');
+      res.io.emit("socketToMe", "User data processed. Sending...");
+
       // Send each user seperately. Can I check all posts got sent with a tally?
       let i = 0;
       let interv = setInterval(()=>{ // Slight delay added as otherwise requestbin seems to lose posts
@@ -61,13 +69,9 @@ router.post('/getSend', (req,res) => {  // Get an instance of `PhoneNumberUtil`.
     }, function (error, result, body) {
       if (error) return console.log(error); // Display with error page?
       else {
-        console.log('Sent successfully: User '+ind+'. Message: '+body);
+        res.io.emit('socketToMe', 'Sent successfully: User '+ind+'. Message: '+body);
       }
     });
-
-/*    
-    res.redirect('/pizzaVote')
- */
 
   }
 

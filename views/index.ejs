@@ -9,13 +9,64 @@
   <meta name="description" content="JQuery Get Post">
   <meta name="author" content="Kevin Nolan">
 
+<style>
+  * {
+    box-sizing: border-box; 
+  }
+  body {
+    font: 13px Helvetica, Arial;
+  }
+  form {
+    background: #efe;
+    padding: 3px;
+    width: 100%;
+  }
+  form button {
+    width: 50%;
+    background: #ccf;
+    padding: 10px;
+  }
+  #messages {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  }
+  #messages li {
+    padding: 5px 10px;
+  }
+  #messages li:nth-child(odd) {
+    background: #dfd;
+  }
+</style>
 
 </head>
 
 <body>
+
 <h1>Get, process and post user list</h1>
+
 <form action="/getsend" method="POST">
+
 <button>Go!</button>
+<h3>Status Messages</h3>
+<ul id="messages"></ul>
+
 </body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+
+<script>
+  $(function () {
+    var socket = io();
+    console.log('done');
+    socket.on('socketToMe', function (msg) {
+      console.log(msg);
+      $('#messages').append($('<li>').text(msg));
+    });
+  });
+  
+</script>
+
 
 </html>
